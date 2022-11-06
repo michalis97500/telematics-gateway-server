@@ -101,7 +101,7 @@ class MessageHandler:
         '''Topic is a json object'''
         # Get timestamp
         timestamp = payload['TM']
-        all_good = False
+        all_good = True
         # Key has information about who sent the parameter
         # It is a string of the form SA_SPN_SPECGR1.SPEC1_SPECGR2.SPEC2_SPECGR3.SPEC3
         # Loop through the payload and extract the parameters
@@ -113,11 +113,54 @@ class MessageHandler:
                 information, payload[key], timestamp)
             if processed_message != None:
                 if self.write_message_to_db(processed_message, topic, note):
-                    all_good = True
+                    continue
                 else:
                     all_good = False
         return all_good
 
+    def error_handler(self,topic,payload,note="NOTE SPECIFIED"):
+        '''Handle error messages'''
+        '''Topic is a json object'''
+        # Get timestamp
+        timestamp_received = payload[0]['TM']
+        all_good = True
+        # Key has information about who sent the parameter
+        # Keys are TM, SA, SID, and FMI
+        # Loop through the payload and extract the parameters
+        
+        #Check if the error is a single error or a list of errors
+        if len(payload) == 1:
+            #This means there are no errors
+            #Create a message saying there are no errors
+            string = str(timestamp_received) + "," + str(topic['case_id']) + "," + str(topic['host_id']) + "," + str(topic['md_id']) + "," + str(topic['packet_type']) + "," + str(-1) + "," + str(-1) + "," + str(-1) + "," + str(-1) + "," + str(-1) + "," + str(-1) + "," + "OK_EVENT"
+            if self.connection:
+                return self.connection.insert_into_messages(string)
+        
+        for error in payload[1:]:
+            string = str(timestamp_received) + "," + str(topic['case_id']) + "," + str(topic['host_id']) + "," + str(topic['md_id']) + "," + str(topic['packet_type']) + "," + str(error['SA']) + "," + str(error['SID']) + "," + str(error['FMI']) + "," + str(error['TM']) + "," + note
+            if self.connection:
+                if self.connection.insert_into_malfunctions(string):
+                    continue
+                else:
+                    all_good = False
+                    
+        return all_good
+    
+    def group_handler(self,topic,payload):
+        '''Handles group messages'''
+        '''Sends the message to the correct handler'''
+        all_good = True
+        for message in payload:
+            #Get the packet type
+            event_id = list(message.keys())[0]
+            information = message[event_id]
+            #Modify topic to include the event id, not the general group id
+            topic['packet_type'] = int(event_id)
+            if not self.message_to_method(topic, information):
+                all_good = False
+        return all_good
+            
+                
     def navigation_handler(self, topic, payload, note="NOT SPECIFIED"):
         '''Handle navigation messages'''
         '''Topic is a json object'''
@@ -139,39 +182,43 @@ class MessageHandler:
             if self.DEBUG:
                 print("Error 13 : Database write error " + str(e))
             return False
+        
+    def message_to_method(self,topic,payload):
+        # if message is a parameter
+        if self.topic_dict[topic['packet_type']] == "parameter":
+            return self.parameter_handler(topic, payload, note="PARAMETER")
+
+        # if message is an event
+        elif self.topic_dict[topic['packet_type']] == "event":
+            return self.parameter_handler(topic, payload, note="EVENT")
+
+        # if message is an error
+        elif self.topic_dict[topic['packet_type']] == "error":
+            return self.error_handler(topic, payload , note="MALFUNCTION")
+
+        # if message is a group
+        elif self.topic_dict[topic['packet_type']] == "group":
+            return self.group_handler(topic, payload)
+
+        # if message is a navigation message
+        elif self.topic_dict[topic['packet_type']] == "navigation":
+            return self.navigation_handler(topic, payload, note="NAVIGATION")
+        return False
+
 
     def message_handle_method(self, message):
         if message:
             try:
                 message_json = json.loads(message, strict=False)
-                topic = json.loads(self.topic_to_json(
-                    message_json['topic']), strict=False)
+                topic = json.loads(self.topic_to_json(message_json['topic']), strict=False)
                 payload = message_json['payload']
-                # From the topic determine the type of message
-
-                # if message is a parameter
-                if self.topic_dict[topic['packet_type']] == "parameter":
-                    return self.parameter_handler(topic, payload, note="PARAMETER")
-
-                # if message is an event
-                elif self.topic_dict[topic['packet_type']] == "event":
-                    return self.parameter_handler(topic, payload, note="EVENT")
-
-                # if message is an error
-                elif self.topic_dict[topic['packet_type']] == "error":
-                    return self.error_handler(topic, payload)
-
-                # if message is a group
-                elif self.topic_dict[topic['packet_type']] == "group":
-                    return self.group_handler(topic, payload)
-
-                # if message is a navigation message
-                elif self.topic_dict[topic['packet_type']] == "navigation":
-                    return self.navigation_handler(topic, payload, note="NAVIGATION")
+                
+                #Send to the correct handler
+                return self.message_to_method(topic, payload)
 
                 # if message is not valid
                 if self.DEBUG:
-                    print("Error 7 : Message is not valid" + str(e))
+                    print("Error 7.1 : Message is not valid" + str(e))
 
             except KeyError as e:
                 if self.DEBUG:
@@ -180,6 +227,6 @@ class MessageHandler:
                     return None
             except Exception as e:
                 if self.DEBUG:
-                    print("Error 7 : Message is not valid" + str(e))
+                    print("Error 7.2 : Message is not valid " + str(e))
                 return None
         return None

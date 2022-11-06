@@ -5,7 +5,7 @@ import message_handler as mh
 def main():
   
   # Create a connection object
-  connection = cn.default_connection()
+  connection = cn.connect(default=True,DEBUG=True)
   # Create a message handler object
   _message_handler = mh.MessageHandler(DEBUG=True)
   #Connect to the broker
