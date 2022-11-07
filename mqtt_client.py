@@ -32,7 +32,7 @@ class MQTTClient:
             except Exception as e:
                 self.last_message = '{"topic":"ERROR","payload":"MSG_NOT_VALID_JSON"}'
                 if self.DEBUG:
-                    print("Client Error 1" + str(e))
+                    print("Client Error 1 " + str(e))
         
         'CLIENT FUNCTION INITIALISATION'
         self.client = mqtt_client.Client(client_id)

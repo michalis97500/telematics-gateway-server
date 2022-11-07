@@ -1,13 +1,52 @@
 import json
 import re
 import database_handler as db
+import time
+
+error_dict = {
+    1: "Topic not valid",
+    2: "Message not valid",
+    3: "Message not valid, missing key",
+    4: "Parameter not valid",
+    5: "Information conversion error",
+    6: "Database write error",
+    7: "Navigation message not valid",
+    8: "Failed to load database configuration file",
+    9: "Failed to connect to database",
+    10: "Database write error",
+}
+
 
 
 class MessageHandler:
-    def __init__(self, DEBUG=False, topic_dict=None):
+    def __init__(self, DEBUG=False, db_configuration_file=None):
 
         self.DEBUG = DEBUG
-        self.connection = db.DatabaseHandler('Database.db')
+        
+        if db_configuration_file:
+            try:
+                configuration_settings = self.load_config(db_configuration_file)
+            except Exception:
+                if self.DEBUG:
+                    print('MH Error 8: Failed to load configuration DB file')
+        
+            try: 
+                self.connection = db.DatabaseHandler(database_name=configuration_settings['DB_NAME'],password=configuration_settings['DB_PASSWORD'])
+            except Exception:
+                if self.DEBUG:
+                    print('MH Error 9.1: Failed to connect to database with given settings')
+                    
+        elif db_configuration_file == None:
+            try:
+                print("No configuration has been provided for the database")
+                db_name = input("Enter the name of the database: ")
+                password = getpass(prompt="Enter the password for the database: ")
+                self.connection = db.DatabaseHandler(database_name=db_name,password=password)
+            except Exception:
+                if self.DEBUG:
+                    print('MH Error 9.2: Failed to connect to database with given settings')
+            
+        
 
         # Topic dictionary, values 1-10 indicate the type of message
         self.topic_dict = {
@@ -36,7 +75,7 @@ class MessageHandler:
                 return json.dumps(data)
         except Exception as e:
             if self.DEBUG:
-                print("Error 6 : Topic is not valid" + str(e))
+                print("MH Error 1 : Topic is not valid " + str(e))
             return topic
 
     def information_to_json(self, information, parameter_value, timestamp):
@@ -48,7 +87,7 @@ class MessageHandler:
             data = {}
             if (len(information) < 2 or len(information) > 5):  # If the information is not valid
                 if self.DEBUG:
-                    print("Error 9 : Parameter is not valid" + str(e))
+                    print("MH Error 4 : Parameter is not valid" + str(e))
                     return None
             data['SA'] = int(information[0])
             data['SVN'] = int(information[1])
@@ -74,7 +113,7 @@ class MessageHandler:
             return json.dumps(data)
         except Exception as e:
             if self.DEBUG:
-                print("Error 10 : information conversion error " + str(e))
+                print("MH Error 5 : information conversion error " + str(e))
             return None
 
     def write_message_to_db(self, processed_message, processed_topic, note="NOT SPECIFIED"):
@@ -93,7 +132,7 @@ class MessageHandler:
             return False
         except Exception as e:
             if self.DEBUG:
-                print("Error 11 : Database write error " + str(e))
+                print("MH Error 6 : Database write error " + str(e))
             return False
 
     def parameter_handler(self, topic, payload, note="NOT SPECIFIED"):
@@ -171,7 +210,7 @@ class MessageHandler:
             string = str(payload['TM']) + "," + str(topic['case_id']) + "," + str(topic['host_id']) + "," + str(
                 topic['md_id']) + "," + str(topic['packet_type']) + "," + str(payload['LA']) + "," + str(payload['LO']) + "," + note
         except Exception as e:
-            print("Error 12 : Navigation message is not valid" + str(e))
+            print("MH Error 7 : Navigation message is not valid" + str(e))
             return False
 
         try:
@@ -180,7 +219,7 @@ class MessageHandler:
             return False
         except Exception as e:
             if self.DEBUG:
-                print("Error 13 : Database write error " + str(e))
+                print("MH Error 10 : Database write error " + str(e))
             return False
         
     def message_to_method(self,topic,payload):
@@ -203,6 +242,10 @@ class MessageHandler:
         # if message is a navigation message
         elif self.topic_dict[topic['packet_type']] == "navigation":
             return self.navigation_handler(topic, payload, note="NAVIGATION")
+        
+        # if message is not valid
+        if self.DEBUG:
+            print("MH Error 2.1 : Message is not valid" + str(e))
         return False
 
 
@@ -215,18 +258,28 @@ class MessageHandler:
                 
                 #Send to the correct handler
                 return self.message_to_method(topic, payload)
-
-                # if message is not valid
-                if self.DEBUG:
-                    print("Error 7.1 : Message is not valid" + str(e))
-
+            
             except KeyError as e:
                 if self.DEBUG:
                     print(
-                        "Error 8 : Message is not valid, missing key from dictionary" + str(e))
+                        "MH Error 3 : Message is not valid, missing key from dictionary" + str(e))
                     return None
             except Exception as e:
                 if self.DEBUG:
-                    print("Error 7.2 : Message is not valid " + str(e))
+                    print("MH Error 2.2 : Message is not valid " + str(e))
                 return None
         return None
+        
+        
+    def load_config(self, file):
+        ''' Load the configuartion file'''
+        try:
+            with open(file) as f:
+                return json.load(f)
+        except ValueError as e:
+            if self.DEBUG:
+                print("DB Load error " + file + " is not a valid JSON file"  + str(e))
+        except Exception as e:
+            if self.DEBUG:
+                print("DB Exception error " + str(e))
+            return None

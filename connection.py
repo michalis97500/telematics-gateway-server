@@ -3,6 +3,12 @@ import json
 import os
 
 _DEBUG = False
+error_dict = {
+    1: "Load configuration file error",
+    2: "Configuration file error, invalid JSON",
+    3: "Initiate connection error",
+    4: "No configuration file provided",
+    }
 
 def connect(default=False, configuration=None,  DEBUG=False) -> mqtt_client.MQTTClient:
     '''Connect to the broker and return client object if successful'''
@@ -14,7 +20,7 @@ def connect(default=False, configuration=None,  DEBUG=False) -> mqtt_client.MQTT
         return initiate_connection(configuration)
     else:
         if _DEBUG:
-            print("Error 6 : No configuration file provided")
+            print("Error 4 : No configuration file provided")
         return None
 
 
@@ -25,10 +31,10 @@ def load_config(file):
             return json.load(f)
     except ValueError as e:
         if _DEBUG:
-            print("Error 2 " + file + " is not a valid JSON file"  + str(e))
+            print("Error 2: " + file + " is not a valid JSON file"  + str(e))
     except Exception as e:
         if _DEBUG:
-            print("Error 1 " + str(e))
+            print("Error 1.2: Failed to load configuration file" + str(e))
         return None
 
 
@@ -38,7 +44,7 @@ def initiate_connection(configuration) -> mqtt_client.MQTTClient:
         configuration_settings = load_config(configuration)
     except Exception as e:
         if _DEBUG:
-            print('Failed to load configuration file')
+            print('Error 1.1 : Failed to load configuration file')
         return None
 
     try:
@@ -55,7 +61,7 @@ def initiate_connection(configuration) -> mqtt_client.MQTTClient:
             return None
     except Exception as e:
         if _DEBUG:
-            print("Error 3 "  + str(e))
+            print("Error 3.1 : Cannot initiate connection "  + str(e))
         return None
 
 def default_connection() -> mqtt_client.MQTTClient:
@@ -64,11 +70,9 @@ def default_connection() -> mqtt_client.MQTTClient:
         if client:
             return client
         else:
-            if _DEBUG:
-                print("Error 4" + 'Failed to initiate client object'  + str(e))
             return None
     except Exception as e:
         if _DEBUG:
-            print("Error 5 : Check connection" + str(e))
+            print("Error 3.2 : Cannot initiate connection " + str(e))
         return None
 
