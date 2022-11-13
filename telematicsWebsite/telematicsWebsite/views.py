@@ -6,16 +6,16 @@ from django.urls import reverse_lazy
 from .forms import edit_profile_form
 from django.contrib.auth.decorators import login_required
 
-def send_to_home():
+def send_to_home(request):
    return render(request, 'index.html')
 
 @login_required
 def index(request):
-    return send_to_home()
+    return send_to_home(request)
 
 @login_required
 def home(request):
-    return send_to_home()
+    return send_to_home(request)
 
 @login_required
 def fleet(request):
@@ -39,5 +39,5 @@ def edit_profile(request):
                     print('User saved')
                 except Exception as e:
                     return HttpResponse(e)
-            return send_to_home()
+            return send_to_home(request)
     return render(request, 'edit_profile.html' )
