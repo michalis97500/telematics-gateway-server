@@ -9,19 +9,19 @@ from django.contrib.auth.decorators import login_required
 def send_to_home(request):
    return render(request, 'index.html')
 
-@login_required
+
 def index(request):
     return send_to_home(request)
 
-@login_required
+
 def home(request):
     return send_to_home(request)
 
-@login_required
+
 def fleet(request):
     return render(request, 'fleet.html')
 
-@login_required    
+ 
 def edit_profile(request):
     user = request.user
     if request.method == 'POST':
@@ -32,7 +32,7 @@ def edit_profile(request):
                     user.first_name = form.cleaned_data['firstname']
                     user.last_name = form.cleaned_data['lastname']
                     user.email = form.cleaned_data['email']
-                    user.username = form.cleaned_data['username']
+                    #user.username = form.cleaned_data['username'] //This should NOT be editable by the user
                     user.account.phone = form.data['phone']
                     user.save()
                     user.account.save()

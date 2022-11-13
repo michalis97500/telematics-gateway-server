@@ -13,7 +13,7 @@
     <label for="id_email">Email:</label>
       <input type="email" name="email" value="{{user.email}}" maxlength="100" required="" id="id_email">
     <label for="id_username">Username:</label>
-      <input type="text" name="username" value="{{user.username}}" maxlength="150" required="" id="id_username">
+      <input disabled type="text" name="username" value="{{user.username}}" maxlength="150" required="" id="id_username">
     <label for="id_phone">Phone:</label>
       <input type="tel" name="phone" placeholder="Phone number" value="{{ user.account.phone }}"  required="" id="id_phone"/>
       <hr>
