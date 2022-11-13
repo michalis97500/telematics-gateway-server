@@ -1,3 +1,6 @@
 paho-mqtt
-pickle
 pysqlcipher3
+
+flask
+Flask-SQLAlchemy
+flask-login

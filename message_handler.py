@@ -13,10 +13,8 @@ error_dict = {
     7: "Navigation message not valid",
     8: "Failed to load database configuration file",
     9: "Failed to connect to database",
-    10: "Database write error",
+    10: "Database write error"
 }
-
-
 
 class MessageHandler:
     def __init__(self, DEBUG=False, db_configuration_file=None):

@@ -1,0 +1,62 @@
+body {
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+}
+
+html {
+  height: -webkit-fill-available;
+}
+
+main {
+  height: 100vh;
+  height: -webkit-fill-available;
+  max-height: 100vh;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.wrapper{
+  display: flex;
+  justify-content: space-between;
+}
+
+.profile {
+  height: 100%;
+  top: 0;
+  bottom: 0;
+  width: 85%;
+  height: 150vh;
+  margin: 2%;
+}
+
+input{
+  width : 50%;
+  display: block;
+}
+
+form {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  margin-top: 10px;
+}
+
+form label{
+  margin-top: 10px;
+}
+
+form input{
+  width: 25%;
+}
+
+form hr{
+  width: 25%
+}
+
+hr{
+  width:25%
+}
+
+
+

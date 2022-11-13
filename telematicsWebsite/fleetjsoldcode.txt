@@ -1,0 +1,45 @@
+
+/*
+//Function to refresh the points
+function refreshPoints() {
+  //Get all the points from the map
+  let features = vectorSource.getFeatures();
+  //Loop through the points
+  let string1 = "<table><tr><th>Truck</th><th>Driver</th><th>Location</th></tr>";
+  let string2 = "";
+  for (const element of features) {
+    if (element != null) {
+      //Get the current point
+      let feature = element;
+      //Get the current point's Name 
+      let name = feature.get('name');
+      //Get the current point's Info
+      let info = feature.get('info');
+      //Get the current point's coordinates
+      let coordinates = feature.getGeometry().getCoordinates();
+      //Add point to html
+      string2 += "<tr><td>" + name + "</td><td>" + info + "</td><td>" + coordinates + "</td></tr>";
+    }
+  }
+  string2 += "</table1>";
+  //Add the points to the html
+  document.getElementById("fleet-table").innerHTML = string1 + string2;
+}
+
+window.addEventListener('load', refreshPoints);
+*/
+
+
+{% extends 'base.html' %} {% load static %} {% block content %}
+<script type="module" src="{% static '/js/fleet.js' %}"></script>
+<link href="{% static 'css/fleet.css' %}" rel="stylesheet" />
+<link href="{% static 'css/leaflet.css' %}" rel="stylesheet" />
+
+  <main id="fleet" class="fleet">
+    <h2>Fleet</h2>
+    <hr />
+    <div id="fleet-table" class="fleet-table"></div>
+    <div id="map" class="map"></div>
+
+{% endblock %}
+

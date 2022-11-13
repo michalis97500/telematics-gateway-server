@@ -1,0 +1,25 @@
+{% load static %}
+{% load crispy_forms_tags %}
+
+<link rel="stylesheet" href="{% static '/css/login.css' %}" />
+<div class="wrapper">
+    <form method="post">
+        {% csrf_token %}
+        <div class="imgcontainer">
+            <img src="{% static '/img/truck_large.png' %}" alt="icon" class="icon" />
+        </div>
+
+        <div class="container">
+            {{form|crispy}}
+            <div style="margin-top: 1%">
+                <label><input type="checkbox" checked="checked" name="remember" /> Remember me </label>
+                <span class="forgot-password">Forgot <a href="#">password?</a></span>
+            </div>
+
+            <div style="margin-bottom: 2%">
+                <button class="login-button btn btn-success" type="submit">Login</button>
+            </div>
+        </div>
+    </form>
+</div>
+

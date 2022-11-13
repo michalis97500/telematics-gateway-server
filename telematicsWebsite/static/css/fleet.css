@@ -1,0 +1,65 @@
+body {
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+}
+
+html {
+  height: -webkit-fill-available;
+}
+
+main {
+  height: 100vh;
+  height: -webkit-fill-available;
+  max-height: 100vh;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.wrapper{
+  display: flex;
+  justify-content: space-between;
+}
+
+
+td, th {
+  border: 1px solid #c4c4c4;
+  text-align: left;
+  padding: 8px;
+}
+
+tr:nth-child(odd){
+  background-color: white;
+}
+tr:nth-child(even) {
+  background-color: #dddddd;
+}
+
+
+.fleet {
+  height: 100%;
+  top: 0;
+  bottom: 0;
+  width: 85%;
+  height: 150vh;
+  margin: 2%;
+}
+
+.fleet-table{
+  width: 50%;
+  height: 50%;
+  float: left;
+  overflow-y: scroll;
+}
+
+.fleet-table table{
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.fleet .map {
+  margin-left: 1%;
+  height: 50%;
+  width: 49%;
+  float: right;
+}

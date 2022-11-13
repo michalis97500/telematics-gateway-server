@@ -1,0 +1,24 @@
+{% extends 'base.html' %} {% load static %} {% block content %}
+<script type="module" src="{% static '/js/fleet.js' %}"></script>
+<link href="{% static 'css/fleet.css' %}" rel="stylesheet" />
+<link href="{% static 'css/leaflet.css' %}" rel="stylesheet" />
+
+  <main id="fleet" class="fleet">
+    <h2>Fleet</h2>
+    <hr />
+    <div id="fleet-table" class="fleet-table"></div>
+    <div id="map" class="map"></div>
+
+    <!--  When this is removed, the functionality in .js has to be removed aswell -->
+    <div>
+      <hr />
+      DEBUG<br />
+      <input type="number" id="lat" name="lat" placeholder="Latitude" />
+      <input type="number" id="lon" name="long" placeholder="Longitude" />
+      <button id="add_point">Add Point</button>
+      <hr />
+    </div>
+  </main>
+</div>
+ {% endblock %}
+

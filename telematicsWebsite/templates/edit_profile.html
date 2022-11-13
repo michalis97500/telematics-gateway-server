@@ -1,0 +1,26 @@
+{% extends 'base.html' %}{% load static %} {% block content %}
+
+<link href="{% static 'css/edit_profile.css' %}" rel="stylesheet" />
+<main class="profile">
+  <h1> Profile editor </h1>
+  <hr>
+  <form method='POST' action=>
+    {% csrf_token %}
+    <label for="id_firstname">First name:</label>
+      <input type="text" name="firstname" value="{{user.first_name}}" maxlength="100" required="" id="id_firstname">
+    <label for="id_lastname">Last name:</label>
+      <input type="text" name="lastname" value="{{user.last_name}}" maxlength="100" required="" id="id_lastname">
+    <label for="id_email">Email:</label>
+      <input type="email" name="email" value="{{user.email}}" maxlength="100" required="" id="id_email">
+    <label for="id_username">Username:</label>
+      <input type="text" name="username" value="{{user.username}}" maxlength="150" required="" id="id_username">
+    <label for="id_phone">Phone:</label>
+      <input type="tel" name="phone" placeholder="Phone number" value="{{ user.account.phone }}"  required="" id="id_phone"/>
+      <hr>
+    <div class="thebutton">
+      <input type='submit' value='Submit' class='btn btn-primary'>
+    </div>
+  </form>
+</main>
+
+{%endblock%}
